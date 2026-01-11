@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory Management System</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Clerk -->
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_c3RyaWtpbmctbWFja2VyZWwtMjYuY2xlcmsuYWNjb3VudHMuZGV2JA"
+    src="https://gentle-basilisk-59.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js">
+  </script>
+</head>
+
+<body style="display:none;"> <!-- 🔴 IMPORTANT -->
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="auth-buttons">
+  <button id="signinBtn">Sign In</button>
+  <button id="signupBtn">Sign Up</button>
+  <button id="logoutBtn" style="display:none;">Logout</button>
+</div>
+
+  </header>
+
+  <!-- WELCOME PAGE -->
+  <section id="welcome">
+    <h1>Welcome to Simple Inventory Management System</h1>
+    <p>Please sign in or sign up to continue</p>
+  </section>
+
+  <!-- CLERK AUTH MODAL -->
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span id="closeAuth">&times;</span>
+      <div id="clerk-auth"></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY APP -->
+  <div id="app" style="display:none;">
+    <h1>Inventory Dashboard</h1>
+
+    <form id="productForm">
+      <input type="hidden" id="productId">
+
+      <input type="text" id="productName" placeholder="Product Name" required>
+      <input type="text" id="category" placeholder="Category" required>
+      <input type="number" id="price" placeholder="Price" required>
+      <input type="number" id="quantity" placeholder="Quantity" required>
+
+      <button type="submit">Save Product</button>
+    </form>
+
+    <h2>Product List</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTable"></tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
