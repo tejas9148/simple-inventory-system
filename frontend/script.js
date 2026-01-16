@@ -49,7 +49,24 @@ window.addEventListener("load", async () => {
     logoutBtn.style.display = "inline-block";
 
     fetchProducts();
-  } else {
+  }if (Clerk.user) {
+  const role = Clerk.user.publicMetadata.role; // 👈 FROM CLERK
+
+  welcome.style.display = "none";
+  app.style.display = "block";
+
+  signinBtn.style.display = "none";
+  signupBtn.style.display = "none";
+  logoutBtn.style.display = "inline-block";
+
+  // 👤 USER → VIEW ONLY
+  if (role !== "admin") {
+    form.style.display = "none"; // hide add/edit form
+  }
+
+  fetchProducts();
+}
+ else {
     // USER NOT LOGGED IN
     welcome.style.display = "block";
     app.style.display = "none";
@@ -95,15 +112,25 @@ async function fetchProducts() {
 
     table.innerHTML = "";
 
-    data.forEach(product => {
-      const row = document.createElement("tr");
+data.forEach(product => {
+  const row = document.createElement("tr");
 
-      row.innerHTML = `
-        <td>${product.productName}</td>
-        <td>${product.category}</td>
-        <td>${product.price}</td>
-        <td>${product.quantity}</td>
-        <td>
+  // ✅ highlight entire row if stock is low
+  if (product.quantity < 5) {
+    row.classList.add("low-stock-row");
+  }
+
+ const role = Clerk.user.publicMetadata.role;
+
+row.innerHTML = `
+  <td>${product.productName}</td>
+  <td>${product.category}</td>
+  <td>${product.price}</td>
+  <td>${product.quantity}</td>
+  <td>
+    ${
+      role === "admin"
+        ? `
           <button class="edit-btn" onclick="editProduct(
             '${product._id}',
             '${product.productName}',
@@ -115,11 +142,17 @@ async function fetchProducts() {
           <button class="delete-btn" onclick="deleteProduct('${product._id}')">
             Delete
           </button>
-        </td>
-      `;
+        `
+        : "View Only"
+    }
+  </td>
+`;
 
-      table.appendChild(row);
-    });
+
+  table.appendChild(row);
+});
+
+
   } catch (err) {
     console.error("Fetch error:", err);
   }

@@ -49,6 +49,20 @@ th, td {
   border: 1px solid #ddd;
   text-align: center;
 }
+.low-stock {
+  color: red;
+  font-weight: bold;
+}
+.low-stock-row {
+  background-color: #ffe6e6; /* light red */
+}
+
+.low-stock-row td {
+  color: #b00000;
+  font-weight: bold;
+}
+
+
 /* ============================
    AUTH (SIGN IN / SIGN UP)
    ============================ */
