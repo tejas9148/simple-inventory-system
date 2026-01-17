@@ -127,3 +127,19 @@ header {
   cursor: pointer;
   color: black;
 }
+/* ============================
+   SEARCH BAR CENTER ALIGN
+   ============================ */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+#searchInput {
+  width: 350px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
