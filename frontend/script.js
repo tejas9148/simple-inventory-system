@@ -2,6 +2,7 @@
  * CONFIG
  ***********************/
 const API_URL = "http://localhost:5000/api/products";
+let allProducts = [];
 
 /***********************
  * UI ELEMENTS
@@ -17,6 +18,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const modal = document.getElementById("auth-modal");
 const closeAuth = document.getElementById("closeAuth");
+const searchInput = document.getElementById("searchInput");
 
 /***********************
  * INVENTORY ELEMENTS
@@ -49,7 +51,24 @@ window.addEventListener("load", async () => {
     logoutBtn.style.display = "inline-block";
 
     fetchProducts();
-  } else {
+  }if (Clerk.user) {
+  const role = Clerk.user.publicMetadata.role; // 👈 FROM CLERK
+
+  welcome.style.display = "none";
+  app.style.display = "block";
+
+  signinBtn.style.display = "none";
+  signupBtn.style.display = "none";
+  logoutBtn.style.display = "inline-block";
+
+  // 👤 USER → VIEW ONLY
+  if (role !== "admin") {
+    form.style.display = "none"; // hide add/edit form
+  }
+
+  fetchProducts();
+}
+ else {
     // USER NOT LOGGED IN
     welcome.style.display = "block";
     app.style.display = "none";
@@ -93,37 +112,55 @@ async function fetchProducts() {
 
     if (!Array.isArray(data)) return;
 
-    table.innerHTML = "";
+    allProducts = data; // ✅ store all products
+    renderProducts(allProducts);
 
-    data.forEach(product => {
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
-        <td>${product.productName}</td>
-        <td>${product.category}</td>
-        <td>${product.price}</td>
-        <td>${product.quantity}</td>
-        <td>
-          <button class="edit-btn" onclick="editProduct(
-            '${product._id}',
-            '${product.productName}',
-            '${product.category}',
-            ${product.price},
-            ${product.quantity}
-          )">Edit</button>
-
-          <button class="delete-btn" onclick="deleteProduct('${product._id}')">
-            Delete
-          </button>
-        </td>
-      `;
-
-      table.appendChild(row);
-    });
   } catch (err) {
     console.error("Fetch error:", err);
   }
 }
+function renderProducts(products) {
+  table.innerHTML = "";
+
+  products.forEach(product => {
+    const row = document.createElement("tr");
+
+    if (product.quantity < 5) {
+      row.classList.add("low-stock-row");
+    }
+
+    const role = Clerk.user.publicMetadata.role;
+
+    row.innerHTML = `
+      <td>${product.productName}</td>
+      <td>${product.category}</td>
+      <td>${product.price}</td>
+      <td>${product.quantity}</td>
+      <td>
+        ${
+          role === "admin"
+            ? `
+              <button class="edit-btn" onclick="editProduct(
+                '${product._id}',
+                '${product.productName}',
+                '${product.category}',
+                ${product.price},
+                ${product.quantity}
+              )">Edit</button>
+
+              <button class="delete-btn" onclick="deleteProduct('${product._id}')">
+                Delete
+              </button>
+            `
+            : "View Only"
+        }
+      </td>
+    `;
+
+    table.appendChild(row);
+  });
+}
+
 
 /***********************
  * ADD / UPDATE PRODUCT
@@ -191,3 +228,24 @@ async function deleteProduct(id) {
     console.error("Delete error:", err);
   }
 }
+/***********************
+ * SEARCH PRODUCTS
+ ***********************/
+/***********************
+ * SEARCH PRODUCTS
+ ***********************/
+searchInput.addEventListener("input", () => {
+  const searchText = searchInput.value.toLowerCase();
+
+  const filteredProducts = allProducts.filter(product => {
+    const name = product.productName?.toLowerCase() || "";
+    const category = product.category?.toLowerCase() || "";
+
+    return (
+      name.includes(searchText) ||
+      category.includes(searchText)
+    );
+  });
+
+  renderProducts(filteredProducts);
+});
